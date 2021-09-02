@@ -4,8 +4,9 @@
 
 ; parser.rkt neede to test
 (require "Parser.rkt")
-(define input  '(((λy.x)((λx.x)(λz.z)))(λv.v)))
-(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
+;(define input  '(((λy.x)((λx.x)(λz.z)))(λv.v)))
+(define input  '((λx.x x)(λx.x)))
+;(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
 
 
 ; we have:
@@ -102,4 +103,4 @@
            ))
   (state 'getT))
 
-(krivine-machine parsed)
+(krivine-machine (compile (parse input) 0 '()))
