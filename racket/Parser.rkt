@@ -1,5 +1,8 @@
 #lang scheme
 
+(provide compile)
+(provide parse)
+
 ;typesystem for lambda calculus
 (define (attach-tag type-tag contents)
   (cons type-tag contents))
@@ -114,7 +117,7 @@
                   (let* ([splitted (split-abstraction stringput)])
                      (make-abstraction ((car splitted) (parse (cdr splitted))))))
                  (else
-                  (make-variable stringput)))))))
+                  (make-variable stringput 'INF)))))))
 
 ;bindings are tracked as a list where every lambda prepends a list of the variables it bounded (in order of binding)
 ;TODO: returns #f if var isnt bound, otherwise it returns a pair of depth when bound (used to calculate v) and the how many-th argument the variable is (k)
