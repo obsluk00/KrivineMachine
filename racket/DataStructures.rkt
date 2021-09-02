@@ -6,43 +6,6 @@
 (provide backloop)
 (provide forloop)
 
-; stack data structure with push and pop
-(define (make-stack)
-  (let ((s '()) (n 0))
-     (lambda (msg . args)  ; msg and arguments, if . used, args is seen as list which can be empty
-       (cond
-         ((eq? msg 'pop)
-            (cond
-              ((null? s)
-                (display "\nERROR: Stack is empty\n"))
-              (else
-                (set! n (- n 1))
-                (define tmpS s)
-                (set! s (cdr s))
-                (car tmpS)))) ;return the car element of stack
-         ((eq? msg 'push)
-            (set! n (+ n 1))
-            (set! s (append (reverse args) s)))
-         ((eq? msg 'get) s)
-         ((eq? msg 'size) n)
-         (else
-          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
-
- 
-; test stack
-(define stack (make-stack))
-(stack 'pop)   ; display stack is empty
-(stack 'invalid)
-(stack 'push "(λx.x)")
-(stack 'push "(λy.y)")
-(stack 'size)
-(stack 'get)
-(define term (stack 'pop))
-term
-(set! term (stack 'pop))
-term
-
-
 ; closure data structure: a pair
 (define (make-closure)
   (let ((c '()))
@@ -69,6 +32,50 @@ term
 (clos 'invalid)
 |#
 
+; stack data structure with push and pop
+(define (make-stack)
+  (let ((s '()) (n 0))
+     (lambda (msg . args)  ; msg and arguments, if . used, args is seen as list which can be empty
+       (cond
+         ((eq? msg 'pop)
+            (cond
+              ((null? s)
+                (display "\nERROR: Stack is empty\n"))
+              (else
+                (set! n (- n 1))
+                (define tmpS s)
+                (set! s (cdr s))
+                (car tmpS)))) ;return the car element of stack
+         ((eq? msg 'push)
+            (set! n (+ n 1))
+            (set! s (append (reverse args) s)))
+         ((eq? msg 'get) s)
+         ((eq? msg 'size) n)
+         ((eq? msg 'display)
+            (define clos (make-closure))
+            (let loop ((i 0))
+               (cond ((< i (length s))
+                   (set! clos (list-ref s i))
+                   (display "[") (display (clos 'fst)) (display ",") (display (clos 'snd)) (display "] ")
+                   (loop (+ i 1))))))
+         (else
+          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
+  
+#|
+; test stack
+(define stack (make-stack))
+(stack 'pop)   ; display stack is empty
+(stack 'invalid)
+(stack 'push '(ABS (λ . 1) VAR 4 . 4))
+(stack 'push '(ABS (λ . 1) VAR 3 . 3))
+(stack 'size)
+(stack 'get)
+(define term (stack 'pop))
+term
+(set! term (stack 'pop))
+term
+|#
+
 ; environment data structure: a list
 ; append arg at the end of list
 (define (make-environment)
@@ -79,7 +86,9 @@ term
           (set! e (append e args)))  ; append takes list, thus no (car args) needed
         ((eq? msg 'getHigh)
           (car e))
-        ((eq? msg 'get) e)
+        ((eq? msg 'getK)
+          (list-ref e (car args))) ; get the kth closure of this environment
+        ((eq? msg 'get) e)        
         (else
           (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
 
@@ -87,10 +96,18 @@ term
 #|
 ; test env
 (define env (make-environment))
+(define env2 (make-environment))
 (env 'append 1)
 (env 'append 2)
 (env 'append 3)
 (env 'append 4)
+(env 'get)
+(env2 'append env)
+(env2 'append 5)
+(env2 'append 6)
+(env2 'getK 2)
+(env2 'get)
+(set! env (env2 'getHigh))
 (env 'get)
 |#
 

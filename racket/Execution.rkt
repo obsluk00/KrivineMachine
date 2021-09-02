@@ -4,7 +4,9 @@
 
 ; parser.rkt neede to test
 (require "Parser.rkt")
-(define input  '(((λy.x)((λx.x)(λz.z)))(λv.vw)))
+(define input  '(((λy.x)((λx.x)(λz.z)))(λv.v)))
+(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
+
 
 ; we have:
 ;    T: Term to execute. From parsing we get pairs
@@ -36,7 +38,7 @@
   (env 'append (s 'getE)) ; update E, the pointer to current environment
   (define stack (s 'getS))
   (let loop ((i (cdr (cadr (s 'getT))))) ; do number of pops
-     (cond ((or (> i 0) (= i 0))
+     (cond ((> i 0)
          (env 'append (stack 'pop))
          (loop (- i 1)))))
   (s 'setE env) ; this is new state environment
@@ -52,33 +54,52 @@
 ;    @Return: a state object
 (define (var s)
   (define env (s 'getE))
+  (define e (make-environment))
   (let ((v (cadr (s 'getT))) (k (cddr (s 'getT))))
+    ;(display (string-append "v:" (number->string v) " k:" (number->string k))) (newline)
     ; get recursive the environment v and update state
     (let loop ((i 0))
-     (cond ((or (< i v) (= i v))
-         (set! env (env 'getHigh))
+     (cond ((< i v)          
+         (set! e (env 'getHigh))
+         (set! env e)
+         (cond ((null? env)
+             (error "Empty environment found. Machine stopped" (env 'get))))         
          (loop (+ i 1)))))
-    (s 'setE env)
-    ; get k closure in the updated state environment and update T
-    (s 'setT (list-ref (s 'getE) k)))
-     s) ; return new state
+    ; get k closure in the updated state environment and update T, check if this is available
+    (cond ((> k (length(env 'get)))
+               (error "No Closure with needed index in environment. Machine stopped" (env 'get)))
+          (else
+               (let ((T '()) (E '()) (clos (make-closure)))
+                   (set! clos (env 'getK k))
+                   (set! T (clos 'fst))
+                   (set! E (clos 'snd))
+                   (s 'setT T) ; elements of clos are T and E
+                   (s 'setE E))
+               s)))) ; return new state
 
 
 ; Krivine Machine
 (define (krivine-machine T)
-  ; create all state object
+  ; create state object
   (define state (krivine-state))
   (state 'setT T)
+  (define n 0)
   ; eval loop
-  (let eval ((state state))
+  (let eval ((state state) (n n))
+     (display (string-append "State after step " (number->string n) ":")) (newline) 
+     (display "T: ") (display (state 'getT)) (newline)
+     (display "S: ") ((state 'getS) 'display) (newline)
+     (display "E: ") (display ((state 'getE) 'get)) (newline) (newline)
      (cond ((eq? (car (state 'getT)) 'APP)
-            (eval (app state)))
-           ((eq? (car (state 'getT)) 'ABS)
-            (eval (abs state)))
+            (eval (app state) (+ n 1)))
+           ((and (not (null? ((state 'getS) 'get))) (eq? (car (state 'getT)) 'ABS))
+            ; start abstraction only if stack is non empty
+            (eval (abs state) (+ n 1)))
            ((eq? (car (state 'getT)) 'VAR)
-            (eval (var state)))
-           ((and (null? (state 'getS)) (null? (state 'getE)))
-            (state))))
+            (eval (var state) (+ n 1)))
+           ((and (null? ((state 'getS) 'get)) (null? ((state 'getE) 'get)))
+            state)  ; termination condition
+           ))
   (state 'getT))
 
-(krivine-machine (parse input))
+(krivine-machine parsed)
