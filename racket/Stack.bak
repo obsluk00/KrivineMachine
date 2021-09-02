@@ -1,0 +1,31 @@
+#lang scheme
+(provide make-stack)
+
+; stack data strcture with push and pop
+(define (make-stack)
+  (let ((s '()) (tmpS '()))
+     (lambda (msg . args)  ; msg and arguments
+       (cond
+         ((eq? msg 'pop)
+            (cond
+              ((null? s)
+                (display "\nERROR: Stack is empty\n"))
+              (else
+                (set! tmpS s)
+                (set! s (cdr s))
+                (car tmpS)))) ;return the car element of stack
+         ((eq? msg 'push)
+            (set! s (append (reverse args) s)))
+         ((eq? msg 'return) s)))))
+
+
+; tests
+(define stack (make-stack))
+(stack 'pop)   ; display stack is empty
+(stack 'push '(λx.x))
+(stack 'push '(λy.y))
+(stack 'return)
+(define term (stack 'pop))
+term
+(set! term (stack 'pop))
+term

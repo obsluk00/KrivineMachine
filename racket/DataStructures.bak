@@ -1,0 +1,99 @@
+#lang scheme
+(provide make-stack)
+(provide make-closure)
+(provide make-env)
+
+; stack data structure with push and pop
+(define (make-stack)
+  (let ((s '()) (tmpS '()))
+     (lambda (msg . args)  ; msg and arguments, if . used, args is seen as list which can be empty
+       (cond
+         ((eq? msg 'pop)
+            (cond
+              ((null? s)
+                (display "\nERROR: Stack is empty\n"))
+              (else
+                (set! tmpS s)
+                (set! s (cdr s))
+                (car tmpS)))) ;return the car element of stack
+         ((eq? msg 'push)
+            (set! s (append (reverse args) s)))
+         ((eq? msg 'get) s)
+         (else
+          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
+
+#|
+; test stack
+(define stack (make-stack))
+(stack 'pop)   ; display stack is empty
+(stack 'invalid)
+(stack 'push "(λx.x)")
+(stack 'push "(λy.y)")
+(stack 'get)
+(define term (stack 'pop))
+term
+(set! term (stack 'pop))
+term
+|#
+
+; closure data structure: a pair
+(define (make-closure)
+  (let ((c '()))
+    (lambda (msg . args)
+      (cond
+        ((eq? msg 'set)
+          (set! c (cons (car args) (cdr args))))
+        ((eq? msg 'fst)
+          (car c))
+        ((eq? msg 'snd)
+          (cadr c))
+        ((eq? msg 'get) c)
+        (else
+          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))        
+
+#|
+; test closure
+(define clos (make-closure))
+(clos 'set "λx.x" "Exp")
+(clos 'fst)
+(clos 'snd)
+(pair? (clos 'get))
+(clos 'get)
+(clos 'invalid)
+|#
+
+; environment data structure: a list
+; cons add head to list. thus we add 1.n at top resulting in n, n-1, .. 1, e and then reverse
+(define (make-env)
+  (let ((e '()))
+    (lambda (msg . args)
+      (cond
+        ((eq? msg 'append)
+          (set! e (append e args)))        
+        ((eq? msg 'get) e)))))
+
+
+#|
+; test env
+(define env (make-env))
+(env 'append 1)
+(env 'append 2)
+(env 'append 3)
+(env 'append 4)
+(env 'get)
+|#
+
+#|
+; test both
+(define stack (make-stack))
+(define clos (make-closure))
+(clos 'set "λx.x" "E")
+(stack 'push clos)
+(clos 'set "λy.y" "F")
+(stack 'push clos)
+((stack 'pop) 'snd)
+|#
+
+
+
+
