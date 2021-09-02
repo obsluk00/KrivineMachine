@@ -152,7 +152,7 @@
         ((eq? 'ABS (car term))
          (compile-abstraction (cdr term) depth bound-list))
         ((eq? 'VAR (car term))
-         (compile-variable (cdr term) depth bound-list))))
+         (make-variable 0 1))))
 
 
 
