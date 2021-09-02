@@ -1,7 +1,5 @@
 #lang scheme
 
-(provide parse)
-
 ;typesystem for lambda calculus
 (define (attach-tag type-tag contents)
   (cons type-tag contents))
@@ -18,8 +16,8 @@
 (define (make-abstraction binding body)
   (attach-tag 'ABS (cons binding body)))
 
-(define (make-variable x)
-  (attach-tag 'VAR x))
+(define (make-variable v k)
+  (attach-tag 'VAR (cons v k)))
 
 ;compiles terms for evaluation
 
@@ -31,10 +29,6 @@
           ((equal? (car list) char) index)
           (else (loop (cdr list) (+ 1 index))))))
 
-;"compiles" first part of an abstraction
-(define (lambda-computer term)
-  (cons #\λ (- (string-length (symbol->string term)) 1)))
-    
 ;"compiles" variables by computing the <v,k> pair
 ;free variables are assigned a numerical encoding according to a->1, b->2, ...
 (define encode-var #hash(("a" . 1)
@@ -91,13 +85,8 @@
                          (25 . "y")
                          (26 . "z")))
 
-(define (compile-variable term var)
-  (cond [(eq? term (string var))
-         (cons 0 'inf)]
-        ))
 
 ;repl
-;TODO: padding of input with brackets
 (define (repl)
   (begin
     (display "Input: ")
@@ -113,6 +102,7 @@
   (let ([dot-index (get-pos-of term #\.)])
     (cons (string->symbol (substring term 0 dot-index)) (string->symbol (substring term (+ 1 dot-index))))))
 
+;creates ast
 (define (parse input)
   (cond ((and (list? input) (empty? (cdr input)))
          (parse (car input)))
@@ -121,12 +111,48 @@
         ((symbol? input)
          (let ([stringput (symbol->string input)])
            (cond ((get-pos-of stringput #\λ)
-                  (make-abstraction (lambda-computer (car (split-abstraction stringput))) (parse (cdr (split-abstraction stringput)))))
+                  (let* ([splitted (split-abstraction stringput)])
+                     (make-abstraction ((car splitted) (parse (cdr splitted))))))
                  (else
                   (make-variable stringput)))))))
 
+;bindings are tracked as a list where every lambda prepends a list of the variables it bounded (in order of binding)
+;TODO: returns #f if var isnt bound, otherwise it returns a pair of depth when bound (used to calculate v) and the how many-th argument the variable is (k)
+(define (bound? var bound-list)
+  (cond ((empty? bound-list)
+         #f)
+        ((eq? (caar bound-list) var)
+         #t)
+        (else (bound? var (cdr bound-list)))))
 
+;adds variable/s being bound at depth to the bound-list
+;TODO
+(define (bind binding depth bound-list)
+  ())
 
+;"compiles" first part of an abstraction
+(define (lambda-computer term)
+  (let ([stringput (symbol->string term)])
+    (cons #\λ (- (string-length stringput) 1))))
+
+(define (compile-abstraction term depth bound-list)
+  (let ([new-bound-list (bind (car term) depth bound-list)])
+  (make-abstraction (lambda-computer term) (compile (cdr term) (+ 1 depth) (new-bound-list)))))
+
+(define (compile-variable var depth bound-list)
+  (let ([binding-info (bound? var bound-list)])
+    (cond (binding-info
+           (make-variable (- depth (car binding-info)) (cdr binding-info)))
+          ((not binding-info)
+           (make-variable (+ depth (hash-ref encode-var (symbol->string var))) 'INF)))))
+
+(define (compile term depth bound-list)
+  (cond ((eq? 'APP (car term))
+         (make-application (compile (car (cdr term)) depth bound-list) (compile (cdr (cdr term)) depth bound-list)))
+        ((eq? 'ABS (car term))
+         (compile-abstraction (cdr term) depth bound-list))
+        ((eq? 'VAR (car term))
+         (compile-variable (cdr term) depth bound-list))))
 
 
 
