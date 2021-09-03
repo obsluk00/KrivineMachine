@@ -22,8 +22,6 @@
 (define (make-variable v k)
   (attach-tag 'VAR (cons v k)))
 
-;compiles terms for evaluation
-
 ;helper to find index of character in string
 (define (get-pos-of string char)
   (let loop ((list (string->list string))
@@ -114,33 +112,38 @@
         ((symbol? input)
          (let ([stringput (symbol->string input)])
            (cond ((get-pos-of stringput #\λ)
-                  (let* ([splitted (split-abstraction stringput)])
-                     (make-abstraction ((car splitted) (parse (cdr splitted))))))
+                  (let ([splitted (split-abstraction stringput)])
+                    (make-abstraction (car splitted) (parse (cdr splitted)))))
                  (else
-                  (make-variable stringput 'INF)))))))
+                  (attach-tag 'VAR stringput)))))))
 
 ;bindings are tracked as a list where every lambda prepends a list of the variables it bounded (in order of binding)
 ;TODO: returns #f if var isnt bound, otherwise it returns a pair of depth when bound (used to calculate v) and the how many-th argument the variable is (k)
 (define (bound? var bound-list)
   (cond ((empty? bound-list)
          #f)
-        ((eq? (caar bound-list) var)
-         #t)
+        ((index-of (caar bound-list) var)
+         (cons (cdr (car bound-list)) (index-of (caar bound-list) var)))
         (else (bound? var (cdr bound-list)))))
 
 ;adds variable/s being bound at depth to the bound-list
-;TODO
 (define (bind binding depth bound-list)
-  ())
+  (cons (cons (binding-helper binding) depth) bound-list))
+
+;creates list of variables (as symbols) that are bound by the first part of an abstraction
+(define (binding-helper binding)
+  (let ([listed (for/list ([chars (string->list (symbol->string binding))])
+                  (string->symbol (string chars)))])
+    (cdr listed)))
 
 ;"compiles" first part of an abstraction
 (define (lambda-computer term)
-  (let ([stringput (symbol->string term)])
+  (let ([stringput (symbol->string (car term))])
     (cons #\λ (- (string-length stringput) 1))))
 
 (define (compile-abstraction term depth bound-list)
   (let ([new-bound-list (bind (car term) depth bound-list)])
-  (make-abstraction (lambda-computer term) (compile (cdr term) (+ 1 depth) (new-bound-list)))))
+  (make-abstraction (lambda-computer term) (compile (cdr term) (+ 1 depth) new-bound-list))))
 
 (define (compile-variable var depth bound-list)
   (let ([binding-info (bound? var bound-list)])
@@ -155,7 +158,7 @@
         ((eq? 'ABS (car term))
          (compile-abstraction (cdr term) depth bound-list))
         ((eq? 'VAR (car term))
-         (make-variable 0 1))))
+         (compile-variable (cdr term) depth bound-list))))
 
 
 
