@@ -115,7 +115,7 @@
                   (let ([splitted (split-abstraction stringput)])
                     (make-abstraction (car splitted) (parse (cdr splitted)))))
                  (else
-                  (attach-tag 'VAR stringput)))))))
+                  (attach-tag 'VAR (string->symbol stringput))))))))
 
 ;bindings are tracked as a list where every lambda prepends a list of the variables it bounded (in order of binding)
 ;TODO: returns #f if var isnt bound, otherwise it returns a pair of depth when bound (used to calculate v) and the how many-th argument the variable is (k)
@@ -146,11 +146,11 @@
   (make-abstraction (lambda-computer term) (compile (cdr term) (+ 1 depth) new-bound-list))))
 
 (define (compile-variable var depth bound-list)
-  (let ([binding-info (bound? (car var) bound-list)])
+  (let ([binding-info (bound? var bound-list)])
     (cond (binding-info
            (make-variable (- (- depth 1) (car binding-info)) (cdr binding-info)))
           ((not binding-info)
-           (make-variable (+ (- depth 1) (hash-ref encode-var (symbol->string (car var)))) 'INF)))))
+           (make-variable (+ (- depth 1) (hash-ref encode-var (symbol->string var))) 'INF)))))
 
 (define (compile term depth bound-list)
   (cond ((eq? 'APP (car term))
