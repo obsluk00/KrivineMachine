@@ -123,7 +123,7 @@
   (cond ((empty? bound-list)
          #f)
         ((index-of (caar bound-list) var)
-         (cons (cdr (car bound-list)) (index-of (caar bound-list) var)))
+         (cons (cdr (car bound-list)) (+ 1(index-of (caar bound-list) var))))
         (else (bound? var (cdr bound-list)))))
 
 ;adds variable/s being bound at depth to the bound-list
