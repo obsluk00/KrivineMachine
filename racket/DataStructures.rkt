@@ -52,7 +52,7 @@
   
 
 #|
-; test stack
+; test stack and closures
 (define stack (make-stack))
 (stack 'pop)   ; display stack is empty
 (stack 'invalid)
