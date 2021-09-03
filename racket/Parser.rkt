@@ -146,11 +146,11 @@
   (make-abstraction (lambda-computer term) (compile (cdr term) (+ 1 depth) new-bound-list))))
 
 (define (compile-variable var depth bound-list)
-  (let ([binding-info (bound? var bound-list)])
+  (let ([binding-info (bound? (car var) bound-list)])
     (cond (binding-info
-           (make-variable (- depth (car binding-info)) (cdr binding-info)))
+           (make-variable (- (- depth 1) (car binding-info)) (cdr binding-info)))
           ((not binding-info)
-           (make-variable (+ depth (hash-ref encode-var (symbol->string var))) 'INF)))))
+           (make-variable (+ (- depth 1) (hash-ref encode-var (symbol->string (car var)))) 'INF)))))
 
 (define (compile term depth bound-list)
   (cond ((eq? 'APP (car term))
