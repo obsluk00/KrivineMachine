@@ -1,10 +1,10 @@
 #lang scheme
 ; require Data Structures and Loop Methods defined in DataStructures.rkt
 (require "DataStructures.rkt")
+; require Parser
+(require "Parser.rkt")
 
-; parser.rkt neede to test
-;(require "Parser.rkt")
-;(define input  '(((λy.x)((λx.x)(λz.z)))(λv.v)))
+(define input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
 ;(define input  '((λx.x x)(λx.x)))
 (define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
 

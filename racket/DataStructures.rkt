@@ -1,10 +1,9 @@
 #lang scheme
+; provide methods for other programm to use it
 (provide make-stack)
 (provide make-closure)
 (provide make-environment)
 (provide krivine-state)
-(provide backloop)
-(provide forloop)
 
 ; closure data structure: a pair
 (define (make-closure)
@@ -150,23 +149,3 @@
 (state2 'setS ((state2 'getS) 'push "λx.x"))
 (state2 'getS)  ; after its not a stack object anymore, no clue why??
 |#
-
-
-;(state 'setS ((state 'getS) 'push "λx.x")) 
-;((state 'getS) 'pop)
-;((state 'getS) 'pop)
-
-
-; loop structures
-(define (backloop first last step proc)
-    (let loop ((i first))
-     (cond ((or (> i last) (= i last))
-         (proc)
-         (loop (- i step))))))
-
-(define (forloop first last step proc)
-    (let loop ((i first))
-     (cond ((or (< i last) (= i last))
-         (proc)
-         (loop (+ i step))))))
-
