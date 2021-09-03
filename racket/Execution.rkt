@@ -3,10 +3,10 @@
 (require "DataStructures.rkt")
 
 ; parser.rkt neede to test
-(require "Parser.rkt")
+;(require "Parser.rkt")
 ;(define input  '(((λy.x)((λx.x)(λz.z)))(λv.v)))
-(define input  '((λx.x x)(λx.x)))
-;(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
+;(define input  '((λx.x x)(λx.x)))
+(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
 
 
 ; we have:
@@ -103,4 +103,5 @@
            ))
   (state 'getT))
 
-(krivine-machine (compile (parse input) 0 '()))
+;(krivine-machine (compile (parse input) 0 '()))
+(krivine-machine parsed)

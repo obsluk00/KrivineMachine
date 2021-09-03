@@ -21,17 +21,6 @@
         (else
           (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))        
 
-#|
-; test closure
-(define clos (make-closure))
-(clos 'set "λx.x" "Exp")
-(clos 'fst)
-(clos 'snd)
-(pair? (clos 'get))
-(clos 'get)
-(clos 'invalid)
-|#
-
 ; stack data structure with push and pop
 (define (make-stack)
   (let ((s '()) (n 0))
@@ -61,19 +50,25 @@
          (else
           (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
   
+
 #|
 ; test stack
 (define stack (make-stack))
 (stack 'pop)   ; display stack is empty
 (stack 'invalid)
-(stack 'push '(ABS (λ . 1) VAR 4 . 4))
-(stack 'push '(ABS (λ . 1) VAR 3 . 3))
+(define clos (make-closure))
+(clos 'set '(ABS (λ . 1) VAR 4 . 4) '())
+(stack 'push clos)
+(define clos2 (make-closure))
+(clos2 'set  '(ABS (λ . 1) VAR 3 . 3) '())
+(stack 'push clos2)
+(stack 'display) (newline)
 (stack 'size)
-(stack 'get)
-(define term (stack 'pop))
-term
-(set! term (stack 'pop))
-term
+(stack 'get) 
+(define term (stack 'pop)) ; is a closure
+(term 'fst)
+(set! term (stack 'pop)) ; is a closure
+(term 'fst)
 |#
 
 ; environment data structure: a list
