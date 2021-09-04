@@ -4,11 +4,6 @@
 ; require Parser
 (require "Parser.rkt")
 
-(define input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
-;(define input  '((λx.x x)(λx.x)))
-(define parsed '(APP (APP (ABS (#\λ . 1) VAR . (  0 . 1)) APP (ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 0 . 1)) ABS (#\λ . 1) VAR . ( 4 . 4)))
-
-
 ; we have:
 ;    T: Term to execute. From parsing we get pairs
 ;    S: The stack. At first empty
@@ -60,11 +55,11 @@
     ;(display (string-append "v:" (number->string v) " k:" (number->string k))) (newline)
     ; get recursive the environment v and update state
     (let loop ((i 0))
-     (cond ((< i v)          
+     (cond ((< i v)
+         (cond ((null? (env 'get))
+             (error "Empty environment found. Machine stopped" (env 'get))))            
          (set! e (env 'getHigh))
-         (set! env e)
-         (cond ((null? env)
-             (error "Empty environment found. Machine stopped" (env 'get))))         
+         (set! env e)         
          (loop (+ i 1)))))
     ; get k closure in the updated state environment and update T, check if this is available
     (cond ((> k (length(env 'get)))
@@ -103,5 +98,17 @@
            ))
   (state 'getT))
 
+;(krivine-machine (compile (parse input) 0 '()))
+
+;tests
+
+(define input  '())
+(define parsed  '())
+
+; 1. test case for errors: v = 23 -> no environment found; <v =0, k = 9999> -> no closure with that index
+;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 23 . 99999) ABS (λ . 1) VAR 0 . 1))
+;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
+
+; 2. Working one '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
+(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
 (krivine-machine (compile (parse input) 0 '()))
-;(krivine-machine parsed)
