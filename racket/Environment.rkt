@@ -3,12 +3,11 @@
 (provide make-environment)
 
 ; environment data structure: a list
-; append arg at the end of list
 (define (make-environment)
   (let ((e '()))
     (lambda (msg . args)
       (cond
-        ((eq? msg 'append)
+        ((eq? msg 'append)    ; append arg at the end of list
           (set! e (append e args)))  ; append takes list, thus no (car args) needed
         ((eq? msg 'getHigh)
           (car e))

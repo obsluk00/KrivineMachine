@@ -7,9 +7,8 @@
 (require "Environment.rkt")
 
 ; Krivine Machine state consisting of next to evaluate term T, stack S and environment E
-; on object creation elements are initialized
 (define (krivine-state)
-  (let ((T '()) (S (make-stack)) (E (make-environment)))
+  (let ((T '()) (S (make-stack)) (E (make-environment)))  ; on object creation elements are initialized
     (lambda (msg . args)  ; args is always a list, to get sinlge element use (car args)
        (cond
           ((eq? msg 'setT) (set! T (car args)))

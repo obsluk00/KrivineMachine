@@ -14,12 +14,12 @@
 ;    E: An environment. At first its the empty Environment
 ;    The three are contained in the krivine-state Object, handled with 'get and 'set
 
+
 ; Execution has 3 rules
 ; 1. Application of the form (λx.x)(λy.y): APP (ABS (#\λ . 1) VAR . "x") ABS (#\λ . 1) VAR . "z")
 ;    Create closure with the address of the latter part (e.g. λy.y), push to stack and update T
 ;    @Param: a state object
 ;    @Return: a state object
-
 (define (app s) 
   (define clos (make-closure))
   (clos 'set (cddr (s 'getT)) (s 'getE)) ; create closure with second part of T pair as new T and the current environment
@@ -29,6 +29,7 @@
   (s 'setT (cadr (s 'getT))) ; T is the first element of the pair which is evaluated next
   s) ; resturn new state
 
+
 ; 2. Abstraction λx.x: (ABS (#\λ . 1) VAR . "u")
 ;    Create new environment e.g (E, clos1, ..., closN), by popping n times from stack
 ;    @Param: a state object
@@ -37,6 +38,8 @@
   (define env (make-environment))
   (env 'append (s 'getE)) ; update E, the pointer to current environment
   (define stack (s 'getS))
+  (cond ((> (cdr (cadr (s 'getT))) (stack 'size))
+          (error "To few Closures on Stack to perform Abstraction. Machine stopped" (stack 'get))))
   (let loop ((i (cdr (cadr (s 'getT))))) ; do number of pops
      (cond ((> i 0)
          (env 'append (stack 'pop))
@@ -45,6 +48,7 @@
   (s 'setS stack) ; new stack
   (s 'setT (cddr (s 'getT))) ;T becomes the last element of former T pair
    s) ; return new state
+
 
 ; 3. Variable x
 ;    The Value of x was replaced by an ordered pair <v,k>
@@ -94,14 +98,14 @@
      (display "S: ") ((state 'getS) 'display) (newline)
      (display "E: ") (display ((state 'getE) 'get)) (newline) (newline)
      (cond ((eq? (car (state 'getT)) 'APP)
-            (eval (app state) (+ n 1)))
+              (eval (app state) (+ n 1)))
            ((and (not (null? ((state 'getS) 'get))) (eq? (car (state 'getT)) 'ABS))
-            ; start abstraction only if stack is non empty
-            (eval (abs state) (+ n 1)))
+               ; start abstraction only if stack is non empty
+              (eval (abs state) (+ n 1)))
            ((eq? (car (state 'getT)) 'VAR)
-            (eval (var state) (+ n 1)))
+              (eval (var state) (+ n 1)))
            ((and (null? ((state 'getS) 'get)) (null? ((state 'getE) 'get)))
-            state)  ; termination condition
+              state)  ; termination condition
            ))
   (state 'getT))
 
@@ -112,9 +116,13 @@
 (define input  '())
 (define parsed  '())
 
-; 1. test case for errors: v = 23 -> no environment found; <v =0, k = 9999> -> no closure with that index
+; 1. test case for errors:
+; v = 23 -> no environment found; <v =0, k = 9999> -> no closure with that index
 ;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 23 . 99999) ABS (λ . 1) VAR 0 . 1))
 ;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
+; Stack error
+;(krivine-machine '(APP (APP (ABS (λ . 3) VAR 0 . 1) VAR 0 . 1) ABS (λ . 1) VAR 0 . 1))
+
 
 ; 2. Working one '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
 ;(APP (APP (ABS (#\λ . 1) VAR 0 . 1) APP (ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1)

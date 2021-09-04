@@ -26,14 +26,11 @@
          ((eq? msg 'size) n)
          ((eq? msg 'display)
             (define clos (make-closure))
-            (cond ((null? s)
-                   (display '()))
-                  (else
-                   (let loop ((i 0))
-                     (cond ((< i (length s))
-                            (set! clos (list-ref s i))
-                            (display "[") (display (clos 'fst)) (display ",") (display (clos 'snd)) (display "] ")
-                            (loop (+ i 1))))))))
+            (let loop ((i 0))
+               (cond ((< i (length s))
+                   (set! clos (list-ref s i))
+                   (display "[") (display (clos 'fst)) (display ",") (display (clos 'snd)) (display "] ")
+                   (loop (+ i 1))))))
          (else
           (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
   
