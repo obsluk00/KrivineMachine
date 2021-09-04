@@ -8,10 +8,14 @@ Luka Obser <luka.obser@unibas.ch>
 Reto Krummenacher <reto.krummenacher@unibas.ch>
 
 ## Jupyter-Notebook
-Die gesamte Arbeit ist als Jupyter-Notebook verfügbar: [KrivineMaschine.ipynb](KrivineMaschine.ipynb)
-Darin enthalten sind die Erklärungen zur Theorie sowie die Codes um die Maschine auszuführen.
+Die gesamte Arbeit ist als Jupyter-Notebook verfügbar: [KrivineMaschine.ipynb](KrivineMaschine.ipynb).
+Darin enthalten sind die Erklärungen zur Theorie sowie die Codes. 
+Um Diese in Jupyter auszuführen, wird der Racket Kernel für Jupyter *IRacket* benötigt.
+Eine Installationsanleitung findet sich unter [https://docs.racket-lang.org/iracket/index.html](https://docs.racket-lang.org/iracket/index.html).
 
-## Dr. Racket
-Aufgrund der Tatsache, dass der Kernel für Racket nicht standardmässig in Jupyter-Notebooks vorhanden ist,
-der Code ebenfalls im ".rkt" format vorhanden, was mit DrRacket ausgeführt werden kann.
-Diese finden sich [hier](racket) zusammen mit einige Tests der einzelnen Datenstrukturen und der Krivin-Maschine selbst.
+## DrRacket
+Aufgrund der Tatsache, dass der Kernel für Racket nicht standardmässig in Jupyter-Notebooks vorhanden ist, wird
+der Code ebenfalls im ".rkt" Format zur verfügung gestellt. Dieser kann mit [DrRacket](https://racket-lang.org/) ausgeführt werden.
+Die Routinen finden sich im Ordner ['racket'](racket) zusammen mit einige Tests der einzelnen [Datenstrukturen](racket\DataStructures.rkt).
+Die Krivine-Maschine ist in [Execution.rkt](racket\Execution.rkt) implementiert und kann nach dem Run (Ctrl+R) 
+mittels Befehle `(krivine-machine (compile (parse '((λx.x x)(λx.x))) 0 '()))` aus der Konsole ausgeführt werden.

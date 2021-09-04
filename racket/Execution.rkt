@@ -110,5 +110,10 @@
 ;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
 
 ; 2. Working one '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
-(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
-(krivine-machine (compile (parse input) 0 '()))
+;(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
+;(krivine-machine (compile (parse input) 0 '()))
+
+; 3. Working one '((λx.x x)(λx.x)) -> result is λx.x in parsed form
+(set! input '((λx.x x)(λx.x)))
+(parse input)
+;(krivine-machine (compile (parse input) 0 '()))
