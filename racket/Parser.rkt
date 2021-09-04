@@ -150,7 +150,7 @@
     (cond (binding-info
            (make-variable (- (- depth 1) (car binding-info)) (cdr binding-info)))
           ((not binding-info)
-           (make-variable (+ (- depth 1) (hash-ref encode-var (symbol->string var))) 'INF)))))
+           (make-variable (+ (- depth 1) (hash-ref encode-var (symbol->string var))) 99999)))))
 
 (define (compile term depth bound-list)
   (cond ((eq? 'APP (car term))
