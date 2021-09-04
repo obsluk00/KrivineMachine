@@ -39,7 +39,7 @@
   (env 'append (s 'getE)) ; update E, the pointer to current environment
   (define stack (s 'getS))
   (cond ((> (cdr (cadr (s 'getT))) (stack 'size))
-          (error "To few Closures on Stack to perform Abstraction. Machine stopped" (stack 'get))))
+          (error "Too few Closures on Stack to perform Abstraction. Machine stopped" (stack 'get))))
   (let loop ((i (cdr (cadr (s 'getT))))) ; do number of pops
      (cond ((> i 0)
          (env 'append (stack 'pop))
