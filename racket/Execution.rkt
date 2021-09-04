@@ -103,5 +103,5 @@
            ))
   (state 'getT))
 
-;(krivine-machine (compile (parse input) 0 '()))
-(krivine-machine parsed)
+(krivine-machine (compile (parse input) 0 '()))
+;(krivine-machine parsed)
