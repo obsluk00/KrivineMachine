@@ -1,24 +1,8 @@
 #lang scheme
 ; provide methods for other programm to use it
 (provide make-stack)
-(provide make-closure)
 (provide make-environment)
 (provide krivine-state)
-
-; closure data structure: a pair
-(define (make-closure)
-  (let ((c '()))
-    (lambda (msg . args)
-      (cond
-        ((eq? msg 'set)
-          (set! c (cons (car args) (cdr args))))
-        ((eq? msg 'fst)
-          (car c))
-        ((eq? msg 'snd)
-          (cadr c))
-        ((eq? msg 'get) c)
-        (else
-          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))        
 
 ; stack data structure with push and pop
 (define (make-stack)
@@ -68,41 +52,6 @@
 (term 'fst)
 (set! term (stack 'pop)) ; is a closure
 (term 'fst)
-|#
-
-; environment data structure: a list
-; append arg at the end of list
-(define (make-environment)
-  (let ((e '()))
-    (lambda (msg . args)
-      (cond
-        ((eq? msg 'append)
-          (set! e (append e args)))  ; append takes list, thus no (car args) needed
-        ((eq? msg 'getHigh)
-          (car e))
-        ((eq? msg 'getK)
-          (list-ref e (car args))) ; get the kth closure of this environment
-        ((eq? msg 'get) e)        
-        (else
-          (display (string-append "\nERROR: Not supported command: " (symbol->string msg))) (newline))))))
-
-
-#|
-; test env
-(define env (make-environment))
-(define env2 (make-environment))
-(env 'append 1)
-(env 'append 2)
-(env 'append 3)
-(env 'append 4)
-(env 'get)
-(env2 'append env)
-(env2 'append 5)
-(env2 'append 6)
-(env2 'getK 2)
-(env2 'get)
-(set! env (env2 'getHigh))
-(env 'get)
 |#
 
 #|

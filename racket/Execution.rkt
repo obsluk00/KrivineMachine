@@ -1,6 +1,10 @@
 #lang scheme
-; require Data Structures and Loop Methods defined in DataStructures.rkt
-(require "DataStructures.rkt")
+; require all Data structures
+(require "KrivineState.rkt")
+(require "Stack.rkt")
+(require "Environment.rkt")
+(require "Closure.rkt")
+
 ; require Parser
 (require "Parser.rkt")
 
@@ -82,7 +86,10 @@
   (define n 0)
   ; eval loop
   (let eval ((state state) (n n))
-     (display (string-append "State after step " (number->string n) ":")) (newline) 
+     (cond ((= n 0)
+            (display "Initial State:") (newline))
+         (else
+            (display (string-append "State after step " (number->string n) ":")) (newline)))
      (display "T: ") (display (state 'getT)) (newline)
      (display "S: ") ((state 'getS) 'display) (newline)
      (display "E: ") (display ((state 'getE) 'get)) (newline) (newline)
@@ -110,10 +117,18 @@
 ;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
 
 ; 2. Working one '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
+;(APP (APP (ABS (#\λ . 1) VAR 0 . 1) APP (ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1)
 ;(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
+;(parse input)
+;(compile (parse input) 0 '())
 ;(krivine-machine (compile (parse input) 0 '()))
 
 ; 3. Working one '((λx.x x)(λx.x)) -> result is λx.x in parsed form
-(set! input '((λx.x x)(λx.x)))
-(parse input)
+;(set! input '((λx.x x)(λx.x)))
+;(parse input)
+;(krivine-machine (compile (parse input) 0 '()))
+(krivine-machine '(APP (ABS (λ . 1) APP (VAR 0 . 1) VAR 0 . 1) ABS (λ . 1) VAR 0 . 1))
+
+;(set! input '((λy.y)(λy.y) (λy.y)))
+;(parse input)
 ;(krivine-machine (compile (parse input) 0 '()))
