@@ -109,34 +109,39 @@
            ))
   (state 'getT))
 
-;(krivine-machine (compile (parse input) 0 '()))
 
 ;tests
-
 (define input  '())
 (define parsed  '())
 
+#| ; start of block comment
 ; 1. test case for errors:
 ; v = 23 -> no environment found; <v =0, k = 9999> -> no closure with that index
-;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 23 . 99999) ABS (λ . 1) VAR 0 . 1))
-;(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
+(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 23 . 99999) ABS (λ . 1) VAR 0 . 1))
+(krivine-machine '(APP (APP (ABS (λ . 1) VAR 0 . 1) VAR 0 . 99999) ABS (λ . 1) VAR 0 . 1))
 ; Stack error
-;(krivine-machine '(APP (APP (ABS (λ . 3) VAR 0 . 1) VAR 0 . 1) ABS (λ . 1) VAR 0 . 1))
+(krivine-machine '(APP (APP (ABS (λ . 3) VAR 0 . 1) VAR 0 . 1) ABS (λ . 1) VAR 0 . 1))
+|# ; end of block comment
 
-
-; 2. Working one '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
+#| 
+; 2. Working: Unparsed '(((λy.y)((λx.x)(λz.z)))(λv.v))) -> result is λv.v, in parsed form
 ;(APP (APP (ABS (#\λ . 1) VAR 0 . 1) APP (ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1) ABS (#\λ . 1) VAR 0 . 1)
-;(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
-;(parse input)
-;(compile (parse input) 0 '())
-;(krivine-machine (compile (parse input) 0 '()))
+(set! input  '(((λy.y)((λx.x)(λz.z)))(λv.v)))
+(parse input)
+(compile (parse input) 0 '())
+(krivine-machine (compile (parse input) 0 '()))
+|#
 
-; 3. Working one '((λx.x x)(λx.x)) -> result is λx.x in parsed form
-;(set! input '((λx.x x)(λx.x)))
-;(parse input)
-;(krivine-machine (compile (parse input) 0 '()))
-(krivine-machine '(APP (ABS (λ . 1) APP (VAR 0 . 1) VAR 0 . 1) ABS (λ . 1) VAR 0 . 1))
+#|
+; 3. Not Working Unparsed '((λx.x x)(λx.x)) -> result is λx.x in parsed form
+(set! input '((λx.x x)(λx.x)))
+(parse input)
+(krivine-machine (compile (parse input) 0 '()))
+; problem is the wrong parsing: (APP (APP (ABS λx VAR . x) VAR . x) ABS λx VAR . x)
+|#
 
-;(set! input '((λy.y)(λy.y) (λy.y)))
-;(parse input)
-;(krivine-machine (compile (parse input) 0 '()))
+#|
+; 4. Korrekt Parsed input '(APP (ABS λx APP (VAR . x) VAR . x) ABS λx VAR . x)
+(set! parsed '(APP (ABS λx APP (VAR . x) VAR . x) ABS λx VAR . x))
+(krivine-machine (compile parsed 0 '()))
+|#
