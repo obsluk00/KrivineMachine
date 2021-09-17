@@ -13,7 +13,7 @@ Thema dieser Arbeit war das Implementieren einer Krivine-Maschine in Scheme. Als
 gewählt. Damit können Erklärungen zur Theorie sowie der geschriebenen Code kompakt untereinander dargestellt werden.
 Zudem bietet Jupyter die Möglichkeit, die Code-Fragemente direkt auszuführen.
 
-## Eingeriechte Materialen
+## Eingereichte Materialen
 
 ### 1. Jupyter-Notebook
 Als Ergebnis unserer Arbeit haben wir eine Jupyter-Notebook erstellt: [KrivineMaschine.ipynb](KrivineMaschine.ipynb).  
